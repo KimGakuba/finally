@@ -8,8 +8,14 @@ from database import SessionLocal
 from models_db import PredictionLog
 
 # load model
-model = joblib.load("models/smart_irrigation_model.pkl")
-target_encoder = joblib.load("models/target_encoder.pkl")
+MODEL_PATH = "models/smart_irrigation_model.pkl"
+
+if not os.path.exists(MODEL_PATH):
+    gdown.download(
+        "https://drive.google.com/drive/folders/17TJRXteqKVGnRr3uHas3feLq9-28kZp2?usp=sharing",
+        MODEL_PATH,
+        quiet=False
+    )
 
 
 def save_log(prediction, confidence):
