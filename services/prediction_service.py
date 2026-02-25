@@ -11,19 +11,20 @@ MODEL_PATH = "models/smart_irrigation_model.pkl"
 ENCODER_PATH = "models/target_encoder.pkl"
 
 os.makedirs("models", exist_ok=True)
-
 if not os.path.exists(MODEL_PATH):
     gdown.download(
         "https://drive.google.com/file/d/1g4xjmGPn8D23WrxpAUb89dj61eNo5CBr/view?usp=drive_link",
         MODEL_PATH,
-        quiet=False
+        quiet=False,
+        fuzzy=True
     )
 
 if not os.path.exists(ENCODER_PATH):
     gdown.download(
         "https://drive.google.com/file/d/13dCZ-773wciiFKQjua-Q2dcoHNnfScZt/view?usp=drive_link",
         ENCODER_PATH,
-        quiet=False
+        quiet=False,
+        fuzzy=True
     )
 
 model = joblib.load(MODEL_PATH)
