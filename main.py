@@ -2,37 +2,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import numpy as np
-import gdown
-import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Download models if not present
-MODEL_PATH = "smart_irrigation_model.pkl"
-ENCODER_PATH = "target_encoder.pkl"
-
-os.makedirs("models", exist_ok=True)
-
-if not os.path.exists(MODEL_PATH):
-    gdown.download(
-        "https://drive.google.com/uc?id=1MvqPRk7KnfO9GNVpftKOCvtsyLO8AnHQ",
-        MODEL_PATH,
-        quiet=False,
-        fuzzy=True
-    )
-
-if not os.path.exists(ENCODER_PATH):
-    gdown.download(
-        "https://drive.google.com/uc?id=13dCZ-773wciiFKQjua-Q2dcoHNnfScZt",
-        ENCODER_PATH,
-        quiet=False,
-        fuzzy=True
-    )
-
-# Load model
-model = joblib.load(MODEL_PATH)
-encoder = joblib.load(ENCODER_PATH)
+model = joblib.load("smart_irrigation_model.pkl")
+encoder = joblib.load("target_encoder.pkl")
 
 @app.route("/")
 def home():
@@ -68,19 +43,3 @@ def predict():
 
 if __name__ == "__main__":
     app.run()
-```
-
-**`requirements.txt`**
-```
-flask==3.0.3
-flask-cors==4.0.1
-numpy==1.26.4
-scikit-learn==1.5.1
-joblib==1.4.2
-gdown==5.2.0
-gunicorn==22.0.0
-```
-
-**Render start command:**
-```
-gunicorn main:app --bind 0.0.0.0:$PORT
