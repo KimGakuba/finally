@@ -1,61 +1,54 @@
 import joblib
 import numpy as np
 import os
-import gdown 
-
+import gdown
 from services.preprocessing import preprocess_input
 from services.business_logic import apply_business_rules
-
 from database import SessionLocal
 from models_db import PredictionLog
 
-# load model
 MODEL_PATH = "models/smart_irrigation_model.pkl"
+ENCODER_PATH = "models/target_encoder.pkl"
+
+os.makedirs("models", exist_ok=True)
 
 if not os.path.exists(MODEL_PATH):
     gdown.download(
-        "https://drive.google.com/drive/folders/17TJRXteqKVGnRr3uHas3feLq9-28kZp2?usp=sharing",
+        "https://drive.google.com/file/d/1g4xjmGPn8D23WrxpAUb89dj61eNo5CBr/view?usp=drive_link",
         MODEL_PATH,
         quiet=False
     )
 
+if not os.path.exists(ENCODER_PATH):
+    gdown.download(
+        "https://drive.google.com/file/d/13dCZ-773wciiFKQjua-Q2dcoHNnfScZt/view?usp=drive_link",
+        ENCODER_PATH,
+        quiet=False
+    )
+
+model = joblib.load(MODEL_PATH)
+target_encoder = joblib.load(ENCODER_PATH)
 
 def save_log(prediction, confidence):
-
     db = SessionLocal()
-
     log = PredictionLog(
-        user_id=1,  # temporary demo user
+        user_id=1,
         prediction=prediction,
         confidence=confidence
     )
-
     db.add(log)
     db.commit()
     db.close()
 
-
 def predict_irrigation(data):
-
     df = preprocess_input(data)
-
     probs = model.predict_proba(df)
-
     pred_class = np.argmax(probs, axis=1)[0]
-
     confidence = float(np.max(probs) * 100)
-
     label = target_encoder.inverse_transform([pred_class])[0]
-
-    recommendation = apply_business_rules(
-        label,
-        data["rainfall"]
-    )
-
-    # save audit log
+    recommendation = apply_business_rules(label, data["rainfall"])
     save_log(label, confidence)
 
-    # confidence color
     if confidence > 90:
         color = "green"
     elif confidence > 80:
@@ -69,3 +62,25 @@ def predict_irrigation(data):
         "color": color,
         "recommendation": recommendation
     }
+```
+
+---
+
+**`.env`** — remove the PYTHON_VERSION line (that's for Render, not your app), and fix your DB host for production:
+```
+DB_USER=root
+DB_PASSWORD=12345
+DB_HOST=localhost
+DB_NAME=irrigation_db
+```
+> ⚠️ `localhost` will not work on Render unless you have a Render MySQL database. You'll need to set `DB_HOST` to your actual database host in Render's environment variables.
+
+---
+
+**`database.py`**, **`models_db.py`**, **`main.py`**, **`routes/predict.py`**, **`schemas.py`**, **`services/preprocessing.py`**, **`services/business_logic.py`** — all look correct, no changes needed.
+
+---
+
+**The most critical fix for your immediate crash:** In `prediction_service.py` you need to replace the folder URL with direct file download URLs. Go to your Google Drive, right-click each `.pkl` file → **Get link** → copy the file ID from the URL (the long string between `/d/` and `/view`), then use:
+```
+https://drive.google.com/uc?id=THAT_FILE_ID
