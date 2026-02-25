@@ -1,7 +1,12 @@
 flask
 flask-cors
+flask-bcrypt
+flask-jwt-extended
 gunicorn
 pandas
 numpy
 scikit-learn
 joblib
+sqlalchemy
+psycopg2-binary
+python-dotenv
