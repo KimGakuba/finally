@@ -62,25 +62,3 @@ def predict_irrigation(data):
         "color": color,
         "recommendation": recommendation
     }
-```
-
----
-
-**`.env`** — remove the PYTHON_VERSION line (that's for Render, not your app), and fix your DB host for production:
-```
-DB_USER=root
-DB_PASSWORD=12345
-DB_HOST=localhost
-DB_NAME=irrigation_db
-```
-> ⚠️ `localhost` will not work on Render unless you have a Render MySQL database. You'll need to set `DB_HOST` to your actual database host in Render's environment variables.
-
----
-
-**`database.py`**, **`models_db.py`**, **`main.py`**, **`routes/predict.py`**, **`schemas.py`**, **`services/preprocessing.py`**, **`services/business_logic.py`** — all look correct, no changes needed.
-
----
-
-**The most critical fix for your immediate crash:** In `prediction_service.py` you need to replace the folder URL with direct file download URLs. Go to your Google Drive, right-click each `.pkl` file → **Get link** → copy the file ID from the URL (the long string between `/d/` and `/view`), then use:
-```
-https://drive.google.com/uc?id=THAT_FILE_ID
