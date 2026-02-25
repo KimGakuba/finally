@@ -13,7 +13,7 @@ ENCODER_PATH = "models/target_encoder.pkl"
 os.makedirs("models", exist_ok=True)
 if not os.path.exists(MODEL_PATH):
     gdown.download(
-        "https://drive.google.com/file/d/1g4xjmGPn8D23WrxpAUb89dj61eNo5CBr/view?usp=drive_link",
+        "https://drive.google.com/file/d/1MvqPRk7KnfO9GNVpftKOCvtsyLO8AnHQ/view?usp=drive_link",
         MODEL_PATH,
         quiet=False,
         fuzzy=True
